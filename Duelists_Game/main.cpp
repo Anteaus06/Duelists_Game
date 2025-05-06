@@ -14,7 +14,7 @@ int main()
 	Player MainPlayer(5, 2, 2, 2, "Adam");
 	Enemy MainEnemy(1, 1, 1, 1, "Lady"); 
 	int RoundNumber = 1;
-	int Heal = 5;
+	int Heal = 1;
 
 	while (MainPlayer.GetIsAlive())
 	{
@@ -28,21 +28,14 @@ int main()
 
 		
 	
- { switch (RoundNumber)
-		{ 
-	case 1: 
-	
-		break;
-	case 2:
-		RoundNumber == 2;
-		{
-		Log::LogMessage(LOG_INFO, MainEnemy.GetName() + " Dropped apple, Adam ate it and healed");
-		MainPlayer.UpdateHealth(Heal);
-		}
-		break;
-		}
+		static bool executed = false;
 
-	}
+		if (RoundNumber == 3 && !executed)
+		{
+			Log::LogMessage(LOG_INFO, MainEnemy.GetName() + " Dropped apple, Adam ate it and healed");
+			MainPlayer.UpdateHealth(Heal);
+			executed = true;
+		}
 		
 		if (!MainEnemy.GetIsAlive())
 		{
@@ -51,7 +44,7 @@ int main()
 	
 			if (RoundNumber > 5)
 			{
-				Log::LogMessage(LOG_INFO, MainEnemy.GetName() + "Man Rules ");
+				Log::LogMessage(LOG_INFO, MainEnemy.GetName() + " bows down! Man Rules ");
 				break;
 			}
 			Log::LogMessage(LOG_DEFAULT, MainEnemy.GetName() + " has been defeated. A new girl appears " );

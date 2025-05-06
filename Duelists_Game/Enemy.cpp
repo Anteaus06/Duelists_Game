@@ -33,20 +33,20 @@ void Enemy::IncreaseDifficulty(int RoundNumber)
 			break;
 		case 3:
 			Health += RoundNumber;
-			AtkPower += RoundNumber;
+			//AtkPower += RoundNumber;
 			Name = "Woman";
 			std::cout << "This woman is strong and has extra health" << std::endl;    
 			break;
 		case 4:
 			Health += RoundNumber;
-			AtkPower += RoundNumber;
+			//AtkPower += RoundNumber;
 			Name = "Wife";
 			std::cout << "Wife has extra health and is stronger" << std::endl;
 			break;
 		case 5:
 			Health += RoundNumber;
-			AtkPower += RoundNumber;
-			AtkPower += RoundNumber / 2;
+			//AtkPower += RoundNumber;
+			//AtkPower += RoundNumber / 2;
 			Name = "Eve";
 			std::cout << "Eve hits harder and has extra health" << std::endl;
 
