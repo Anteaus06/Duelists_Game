@@ -1,0 +1,43 @@
+Game structure
+
+Inheritance:
+
+
+Character:
+Health amount
+Is Alive?
+Take damage
+Heal?
+Attack damage
+Defense
+
+
+Playter:
+3 lives
+attack, parry/dodge, defend <- cin
+
+enemy:
+increase difficulty and life
+each enemy has own health and might choose 3 actions: attack parry and defend
+
+Game loop:
+each roung enemy and player choose action
+win by surviving
+game harder as player defeats more enemies
+
+Game Mechanics:
+attack v attack = clash
+attack v parry = counter attack , attacker takes 2 damage
+attack v defend = whoever defended takes half damage.
+
+goal to survive.
+
+--------------------------
+Challenge 
+find bugs
+space out lines of text
+nothing bad occurs during a parry
+
+BONUS
+==================
+try to implement a power up from a win. 
