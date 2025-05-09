@@ -13,12 +13,11 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy);
 int main(void)
 {
 
-	//======= RAYLIB Initialization ============
+
 	const int screenWidth = 800;
 	const int screenHeight = 600;
 	InitWindow(screenWidth, screenHeight, "Adams Temptation");
 	SetTargetFPS(60);
-	//===== Game Init ==========================
 
 	Player MainPlayer(5, 2, 2, 2, "Adam");
 	Enemy MainEnemy(1, 1, 1, 1, "Lady");
@@ -67,10 +66,8 @@ int main(void)
 				DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
 				GameOver = true;
 			}
+
 			DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
-
-
-
 			MainEnemy.IncreaseDifficulty(RoundNumber);
 			DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 200, 20, LIGHTGRAY);
 			MainPlayer.InitStats();
@@ -87,10 +84,9 @@ int main(void)
 
 	}
 
-
-	// De-Initialization
 	CloseWindow();
 	return 0;
+}
 
 	void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy)
 	{
@@ -137,7 +133,7 @@ int main(void)
 				break;
 
 			case PARRY:
-				DrawText(("Both lost stamina by Parrying").c_str(), 190, 200, 20, LIGHTGRAY);
+				DrawText("Both lost stamina by Parrying", 190, 200, 20, LIGHTGRAY);
 			case DEFEND:
 				break;
 				DrawText("Adam loses Stamina while the Enemy recovers!", 190, 200, 20, LIGHTGRAY);
@@ -164,10 +160,14 @@ int main(void)
 			}
 
 			break;
-		}
 
+		}
 	}
-}
+
+	
+
+	
+
 
 /*
 int main()

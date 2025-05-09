@@ -104,12 +104,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\NelsonSchool\Desktop\VertexSchool\GDP_term1\Duelists_Game\raylib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Owner\Desktop\vertex\Duelist_Game\Duelists_Game\raylib\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\NelsonSchool\Desktop\VertexSchool\GDP_term1\Duelists_Game\raylib\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Owner\Desktop\vertex\Duelist_Game\Duelists_Game\raylib\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
