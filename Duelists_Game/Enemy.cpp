@@ -45,7 +45,7 @@ void Enemy::IncreaseDifficulty(int RoundNumber)
 			return;
 		case 5:
 			Health += RoundNumber;
-			//AtkPower += RoundNumber;
+			AtkPower += RoundNumber;
 			//AtkPower += RoundNumber / 2;
 			Name = "Eve";
 			std::cout << "Eve hits harder and has extra health" << std::endl;

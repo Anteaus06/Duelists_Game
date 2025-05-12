@@ -6,8 +6,11 @@
 //#include "Character.h"
 
 enum GameState {WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO};
-
+void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
 void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction);
+void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer);
+
+
 
 int main(void)
 {
@@ -59,96 +62,106 @@ int main(void)
 		
 		if (State == WAITING_FOR_INPUT)
 		{
-			DrawText("Choose Action 1 attack 2 parry 3 defend", 10, 30, 20, GREEN);
-			switch (GetKeyPressed())
-			{
-			case KEY_ONE:
-				PlayerAction = ATTACK;
-				State = PROCESSING;
-				break;
+			DrawWaitForInput(PlayerAction, State, MainPlayer, StateBuffer);
 
-			case KEY_TWO:
-				if (MainPlayer.GetStamina() > 0)
-				{
-					MainPlayer.UpdateStamina(false);
-					PlayerAction = PARRY;
-					State = PROCESSING;
-					break;
-				}
-				else
-				{
-					State = INFO;
-					StateBuffer = WAITING_FOR_INPUT;
-					DrawText(" you are drained Defend to regain strength", 10, 300, 20, RED);
-					break;
-				}
-			case KEY_THREE:
-				PlayerAction = DEFEND;
-				State = PROCESSING;
-				MainPlayer.UpdateStamina(true);
-				break;
-			
-			default:
-				break;
-			}
 		}
 
 		else if (State == PROCESSING)
 		{
+			DrawOutcome(MainPlayer, MainEnemy, PlayerAction, State, StateBuffer, RoundNumber, Wait);
 
-			ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
-			StateBuffer = WAITING_FOR_INPUT;
-
-			static bool executed = false;
-
-			if (RoundNumber == 3 && !executed)
-			{
-				DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
-				MainPlayer.UpdateHealth(Heal);
-				executed = true;
-				StateBuffer = WAITING_FOR_INPUT;
-			}
-
-			if (!MainEnemy.GetIsAlive())
-			{
-
-				RoundNumber++; // += 1; WAS ORIGINAL SUPPOSDELY THE SAME OUTCOME
-
-				if (RoundNumber > 5)
-				{
-					DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
-					StateBuffer = GAME_OVER;
-				}
-				else
-				{
-					DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
-					MainEnemy.IncreaseDifficulty(RoundNumber);
-					DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 220, 20, LIGHTGRAY);
-					MainPlayer.InitStats();
-					DrawText((MainEnemy.GetName() + " glares while, Adam Recovers his stamina\n ready for the next...").c_str(), 190, 240, 20, YELLOW);
-					StateBuffer = WAITING_FOR_INPUT;
-					Wait = 5;
-
-				}
-			}
-
-			if (!MainPlayer.GetIsAlive())
-			{
-				DrawText("Adam fell to sin ", 10, 350, 20, RED);
-				StateBuffer = GAME_OVER;
-			}
-			State = INFO;
-			}
-
+		}
 			EndDrawing();
 		
-		}
+		
 		
 	CloseWindow();
 	return 0;
 }
 
-	void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy, Action PlayerAction)
+	void DrawWaitForInput(Action & PlayerAction, GameState & State, Player & MainPlayer, GameState & StateBuffer);
+	{
+		DrawText("Choose Action 1 attack 2 parry 3 defend", 10, 30, 20, GREEN);
+		switch (GetKeyPressed())
+		{
+		case KEY_ONE:
+			PlayerAction = ATTACK;
+			State = PROCESSING;
+			break;
+
+		case KEY_TWO:
+			if (MainPlayer.GetStamina() > 0)
+			{
+				MainPlayer.UpdateStamina(false);
+				PlayerAction = PARRY;
+				State = PROCESSING;
+				break;
+			}
+			else
+			{
+				State = INFO;
+				StateBuffer = WAITING_FOR_INPUT;
+				DrawText(" you are drained Defend to regain strength", 10, 300, 20, RED);
+				break;
+			}
+		case KEY_THREE:
+			PlayerAction = DEFEND;
+			State = PROCESSING;
+			MainPlayer.UpdateStamina(true);
+			break;
+
+		default:
+			break;
+	}
+
+void DrawOutcome(Player& MainPlayer, Enemy & MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
+{
+	ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
+	StateBuffer = WAITING_FOR_INPUT;
+
+	static bool executed = false;
+
+	if (RoundNumber == 3 && !executed)
+	{
+		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
+		MainPlayer.UpdateHealth(Heal);
+		executed = true;
+		StateBuffer = WAITING_FOR_INPUT;
+	}
+
+	if (!MainEnemy.GetIsAlive())
+	{
+
+		RoundNumber++; // += 1; WAS ORIGINAL SUPPOSDELY THE SAME OUTCOME
+
+		if (RoundNumber > 5)
+		{
+			DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
+			StateBuffer = GAME_OVER;
+		}
+		else
+		{
+			DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
+			MainEnemy.IncreaseDifficulty(RoundNumber);
+			DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 220, 20, LIGHTGRAY);
+			MainPlayer.InitStats();
+			DrawText((MainEnemy.GetName() + " glares while, Adam Recovers his stamina\n ready for the next...").c_str(), 190, 240, 20, YELLOW);
+			StateBuffer = WAITING_FOR_INPUT;
+			Wait = 5;
+
+		}
+	}
+
+	if (!MainPlayer.GetIsAlive())
+	{
+		DrawText("Adam fell to sin ", 10, 350, 20, RED);
+		StateBuffer = GAME_OVER;
+	}
+	State = INFO;
+
+}
+
+void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy, Action PlayerAction)
 	{
 
 		// process round based on actions
