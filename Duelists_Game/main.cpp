@@ -3,7 +3,8 @@
 #include <iostream>
 #include "Player.h"
 #include "Enemy.h"
-//#include "Character.h"
+#include "Character.h"
+#include <map>
 
 enum GameState {WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO};
 void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
@@ -89,7 +90,7 @@ int main(void)
 			State = PROCESSING;
 			break;
 
-		case KEY_TWO:
+		case KEY_TWO: 
 			if (MainPlayer.GetStamina() > 0)
 			{
 				MainPlayer.UpdateStamina(false);
@@ -112,6 +113,8 @@ int main(void)
 
 		default:
 			break;
+
+		}
 	}
 
 void DrawOutcome(Player& MainPlayer, Enemy & MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
@@ -161,18 +164,47 @@ void DrawOutcome(Player& MainPlayer, Enemy & MainEnemy, Action PlayerAction, Gam
 
 }
 
-void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy, Action PlayerAction)
+void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction);
 	{
 
 		// process round based on actions
 		Action EnemyAction = MainEnemy.ChooseAction();
+		//Lambda for mapping Action to String
+		auto GetActionString = [](Action action)-> std::string
+			{
+				switch (action)
+				{
+				case ATTACK: return "Attack";
+				case DEFEND: return "Defend";
+				case PARRY: return "Parry";
+				default: return "";
+				}
+			};
 
-		std::string PlayerActionStr = (PlayerAction == ATTACK) ? "Attack" : (PlayerAction == DEFEND) ? "Defend " : "Parry";
-		std::string EnemyActionStr = (EnemyAction == ATTACK) ? "Attack" : (EnemyAction == DEFEND) ? "Defend " : "Parry";
+		std::string PlayerActionStr = GetActionString(PlayerAction);
+		std::string EnemyActionStr = GetActionString(EnemyAction);
 
 		// Display player and enemy actions
 		DrawText(("Adam " + PlayerActionStr + "s").c_str(), 10, 60, 20, LIGHTGRAY);
 		DrawText(("She " + EnemyActionStr + "s").c_str(), 10, 80, 20, LIGHTGRAY);
+
+		std::map<std::pair<Action, Action>, std::string> OutcomeText
+		{
+
+				{ { ATTACK, ATTACK }, "Clash! wow close one " },
+				{ { ATTACK, PARRY }, MainEnemy.GetName() + " Parries the attack! We got hurt "},
+				{ { ATTACK, DEFEND }, MainEnemy.GetName() + " Blocked attack, took less damage" },
+				{ { PARRY, ATTACK }, "Adam Parries and Hurt her " },
+				{ { PARRY, DEFEND }, "Adam loses Stamina while the Enemy recovers!" },
+				{ { PARRY, PARRY }, "Both lost stamina by Parrying" },
+				{ { DEFEND, ATTACK }, "Adam defended against the attack! took little damage" },
+				{ { DEFEND, DEFEND }, "both are recovering "},
+				{ { DEFEND, PARRY }, "Enemy loses Stamina while Adam Recovers " }
+		};
+			//DISPLAY OUTCOME TEXT
+			DrawText(OutcomeText[{PlayerAction, EnemyAction}].c_str(), 10, 120, 20, DARKGRAY)
+				// health adj
+
 
 		switch (PlayerAction)
 		{
