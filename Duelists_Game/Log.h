@@ -5,10 +5,10 @@
 //enmu is enummeration
 enum LogType
 {
-	LOG_DEFAULT,
-	LOG_INFO,// 0        THESE ARE LOG TYPES
-	LOG_WARNING,//1
-	LOG_ERROR //2
+	GAME_LOG_DEFAULT,
+	GAME_LOG_INFO,// 0        THESE ARE LOG TYPES
+	GAME_LOG_WARNING,//1
+	GAME_LOG_ERROR //2
 };
 
 //Struct

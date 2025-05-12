@@ -23,16 +23,16 @@ void Log::PrintLog(LogEntry& Entry)
 	std::string color;
 	switch (Entry.Type)
 	{
-	case LOG_INFO:
+	case GAME_LOG_INFO:
 		color = "\x1B[32m"; //Green in ANSI color code 
 		break;
-	case LOG_WARNING:
+	case GAME_LOG_WARNING:
 		color = "\x1B[33m"; // yellow
 		break;
-	case LOG_ERROR:
+	case GAME_LOG_ERROR:
 		color = "\x1B[91m"; // red
 		break;
-	case LOG_DEFAULT:
+	case GAME_LOG_DEFAULT:
 	default:
 		color = "\x1B[37m"; // white
 		break;

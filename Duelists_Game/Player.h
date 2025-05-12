@@ -6,7 +6,6 @@ class Player : public Character
 {
 public:
 	Player(int MaxHealth, int AtkPower, int Heal, int MaxStamina, std::string Name);
-	
 	Action ChooseAction() override;
 	void GetHeal(int MaxHealth);
 

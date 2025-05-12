@@ -1,6 +1,6 @@
 #include "Character.h"
 #include <iostream>
-
+#include "raylib.h"
 
 
 Character::Character(int MaxHealth, int AtkPower, int Heal, int MaxStamina, std::string Name) : 
@@ -14,6 +14,7 @@ void Character::UpdateHealth(int Amount)
 	Health += Amount;
 	if (Health <= 0) Health = 0;
 	std::cout << Name << " has " << Health << " remaining" << std::endl;
+	DrawText((Name + " has " + std::to_string(Health) + " Health remaining.").c_str(), 190, 180, 20, GREEN);
 }
 
 void Character::UpdateStamina(bool Increase)

@@ -1,14 +1,13 @@
-﻿
-
-//duelingGame
+﻿//duelingGame
 #include "raylib.h"
 #include <iostream>
 #include "Player.h"
 #include "Enemy.h"
 //#include "Character.h"
 
+enum GameState {WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO};
 
-void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy);
+void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction);
 
 int main(void)
 {
@@ -24,17 +23,30 @@ int main(void)
 	int RoundNumber = 1;
 	int Heal = 1;
 	bool GameOver = false;
+	int Wait = 3;
+
+	GameState State = WAITING_FOR_INPUT;
+	GameState StateBuffer = WAITING_FOR_INPUT;
+
+	Action PlayerAction = NONE;
+	bool ActionChosen = false;
 
 	//	DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
 		// Refreshes screen every loop
+		if (State == INFO)
+		{
+			WaitTime(Wait);
+			State = StateBuffer;
+			Wait = 3;
+		}
 
 		BeginDrawing();      //~~~~ Begin frame rendering  ~~~~~~~//
 		ClearBackground(BLACK); // CLEAR THE BACKGROUND
 
-		if (GameOver)
+		if (State == GAME_OVER)
 		{
 
 			DrawText("Game Over. Press ESC to exit. ", 190, 200, 20, LIGHTGRAY);
@@ -43,64 +55,111 @@ int main(void)
 
 		}
 
-		DrawText(("Round " + std::to_string(RoundNumber)).c_str(), 10, 15, 20, LIGHTGRAY);
-		ProcessOutcome(MainPlayer, MainEnemy);
+		DrawText(("Round " + std::to_string(RoundNumber)).c_str(), 10, 10, 20, LIGHTGRAY);
+		
+		if (State == WAITING_FOR_INPUT)
+		{
+			DrawText("Choose Action 1 attack 2 parry 3 defend", 10, 30, 20, GREEN);
+			switch (GetKeyPressed())
+			{
+			case KEY_ONE:
+				PlayerAction = ATTACK;
+				State = PROCESSING;
+				break;
 
-		/*----------------------------- MY CODE FOR DROPING AN APPLE ------------------------------------
+			case KEY_TWO:
+				if (MainPlayer.GetStamina() > 0)
+				{
+					MainPlayer.UpdateStamina(false);
+					PlayerAction = PARRY;
+					State = PROCESSING;
+					break;
+				}
+				else
+				{
+					State = INFO;
+					StateBuffer = WAITING_FOR_INPUT;
+					DrawText(" you are drained Defend to regain strength", 10, 300, 20, RED);
+					break;
+				}
+			case KEY_THREE:
+				PlayerAction = DEFEND;
+				State = PROCESSING;
+				MainPlayer.UpdateStamina(true);
+				break;
+			
+			default:
+				break;
+			}
+		}
+
+		else if (State == PROCESSING)
+		{
+
+			ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
+			StateBuffer = WAITING_FOR_INPUT;
+
 			static bool executed = false;
 
-		if (RoundNumber == 3 && !executed)
-		//	{
-				DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 190, 200, 20, LIGHTGRAY);
+			if (RoundNumber == 3 && !executed)
+			{
+				DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
 				MainPlayer.UpdateHealth(Heal);
 				executed = true;
-		//	}
-		*/
-		if (!MainEnemy.GetIsAlive())
-		{
-
-			RoundNumber++; // += 1; WAS ORIGINAL SUPPOSDELY THE SAME OUTCOME
-
-			if (RoundNumber > 5)
-			{
-				DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
-				GameOver = true;
+				StateBuffer = WAITING_FOR_INPUT;
 			}
 
-			DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
-			MainEnemy.IncreaseDifficulty(RoundNumber);
-			DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 200, 20, LIGHTGRAY);
-			MainPlayer.InitStats();
-			DrawText((MainEnemy.GetName() + " glares while, Adam Recovers his stamina ready for the next...").c_str(), 190, 200, 20, GREEN);
+			if (!MainEnemy.GetIsAlive())
+			{
 
+				RoundNumber++; // += 1; WAS ORIGINAL SUPPOSDELY THE SAME OUTCOME
+
+				if (RoundNumber > 5)
+				{
+					DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
+					StateBuffer = GAME_OVER;
+				}
+				else
+				{
+					DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
+					MainEnemy.IncreaseDifficulty(RoundNumber);
+					DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 220, 20, LIGHTGRAY);
+					MainPlayer.InitStats();
+					DrawText((MainEnemy.GetName() + " glares while, Adam Recovers his stamina\n ready for the next...").c_str(), 190, 240, 20, YELLOW);
+					StateBuffer = WAITING_FOR_INPUT;
+					Wait = 5;
+
+				}
+			}
+
+			if (!MainPlayer.GetIsAlive())
+			{
+				DrawText("Adam fell to sin ", 10, 350, 20, RED);
+				StateBuffer = GAME_OVER;
+			}
+			State = INFO;
+			}
+
+			EndDrawing();
+		
 		}
-
-		if (!MainPlayer.GetIsAlive())
-		{
-			DrawText("Adam fell to sin ", 190, 200, 20, RED);
-			GameOver = true;
-		}
-		EndDrawing();
-
-	}
-
+		
 	CloseWindow();
 	return 0;
 }
 
-	void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy)
+	void ProcessOutcome(Player & MainPlayer, Enemy & MainEnemy, Action PlayerAction)
 	{
 
 		// process round based on actions
-		Action PlayerAction = MainPlayer.ChooseAction();
 		Action EnemyAction = MainEnemy.ChooseAction();
 
 		std::string PlayerActionStr = (PlayerAction == ATTACK) ? "Attack" : (PlayerAction == DEFEND) ? "Defend " : "Parry";
 		std::string EnemyActionStr = (EnemyAction == ATTACK) ? "Attack" : (EnemyAction == DEFEND) ? "Defend " : "Parry";
 
 		// Display player and enemy actions
-		DrawText(("Adam " + PlayerActionStr + "s").c_str(), 10, 40, 20, LIGHTGRAY);
-		DrawText(("She " + EnemyActionStr + "s").c_str(), 10, 60, 20, LIGHTGRAY);
+		DrawText(("Adam " + PlayerActionStr + "s").c_str(), 10, 60, 20, LIGHTGRAY);
+		DrawText(("She " + EnemyActionStr + "s").c_str(), 10, 80, 20, LIGHTGRAY);
 
 		switch (PlayerAction)
 		{
@@ -128,15 +187,15 @@ int main(void)
 			switch (EnemyAction)
 			{
 			case ATTACK:
-				DrawText("Adam Parries and Hurt her ", 190, 200, 20, LIGHTGRAY);
+				DrawText("Adam Parries and Hurt her ", 190, 150, 20, LIGHTGRAY);
 				MainEnemy.UpdateHealth(-(MainPlayer.GetAtkPower() * 2));
 				break;
 
 			case PARRY:
-				DrawText("Both lost stamina by Parrying", 190, 200, 20, LIGHTGRAY);
+				DrawText("Both lost stamina by Parrying", 190, 150, 20, LIGHTGRAY);
 			case DEFEND:
 				break;
-				DrawText("Adam loses Stamina while the Enemy recovers!", 190, 200, 20, LIGHTGRAY);
+				DrawText("Adam loses Stamina while the Enemy recovers!", 190, 150, 20, LIGHTGRAY);
 				//MainPlayer.UpdateHealth(-(MainEnemy.GetAtkPower() * 2));
 				break;
 
@@ -147,15 +206,15 @@ int main(void)
 			switch (EnemyAction)
 			{
 			case ATTACK:
-				DrawText("Adam defended against the attack! took little damage", 190, 200, 20, LIGHTGRAY);
+				DrawText("Adam defended against the attack! took little damage", 190, 210, 20, LIGHTGRAY);
 				MainPlayer.UpdateHealth(-(MainEnemy.GetAtkPower() + 1));
 				break;
 
 			case PARRY:
-				DrawText("Enemy loses Stamina while Adam Recovers ", 190, 200, 20, LIGHTGRAY);
+				DrawText("Enemy loses Stamina while Adam Recovers ", 190, 210, 20, LIGHTGRAY);
 				break;
 			case DEFEND:
-				DrawText("both are recovering ", 190, 200, 20, LIGHTGRAY);
+				DrawText("both are recovering ", 190, 210, 20, LIGHTGRAY);
 				break;
 			}
 
