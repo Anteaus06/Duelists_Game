@@ -42,6 +42,9 @@
     <ClCompile Include="Log.cpp">
       <Filter>Source Files\Log</Filter>
     </ClCompile>
+    <ClCompile Include="LambdaReference.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
