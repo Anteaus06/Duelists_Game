@@ -30,7 +30,7 @@ int main(void)
 	SetTargetFPS(60);
 
 	Player MainPlayer(5, 2, 2, 2, "Adam");
-	Enemy MainEnemy(1, 1, 0, 1, "Lady");
+	Enemy MainEnemy(1, 1, 0, 1, "This Lady");
 	int RoundNumber = 1;
 	int Heal = 1;
 	bool GameOver = false;
@@ -130,15 +130,15 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 	ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
 	StateBuffer = WAITING_FOR_INPUT;
 
-	//static bool executed = false;	
+	static bool executed = false;	
 
-	//if (RoundNumber == 3 && !executed)
-	//{
-	//	DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
-	//	MainPlayer.UpdateHealth(2);
-	//	executed = true;
-	//	StateBuffer = WAITING_FOR_INPUT;
-	//}
+	if (RoundNumber == 3 && !executed)
+	{
+		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
+		MainPlayer.UpdateHealth(2);
+		executed = true;
+		StateBuffer = WAITING_FOR_INPUT;
+	}
 
 	if (!MainEnemy.GetIsAlive())
 	{
