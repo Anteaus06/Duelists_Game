@@ -1,16 +1,15 @@
-﻿//duelingGame
-#include <iostream>
+﻿#include <iostream>
 #include "raylib.h"
+#include "Log.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "Character.h"
 #include <map>
 #include <functional>
 
 
-enum GameState {WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO};
+enum GameState { WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO };
 void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
-void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction);
+void ProcessOutcome(Player& Mainplayer, Enemy& MainEnemy, Action PlayerAction);
 void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer);
 
 struct CombatOutcome
@@ -22,8 +21,6 @@ struct CombatOutcome
 
 int main(void)
 {
-
-
 	const int screenWidth = 800;
 	const int screenHeight = 600;
 	InitWindow(screenWidth, screenHeight, "Adams Temptation");
@@ -33,7 +30,7 @@ int main(void)
 	SetTargetFPS(60);
 
 	Player MainPlayer(5, 2, 2, 2, "Adam");
-	Enemy MainEnemy(1, 1, 1, 1, "Lady");
+	Enemy MainEnemy(1, 1, 0, 1, "Lady");
 	int RoundNumber = 1;
 	int Heal = 1;
 	bool GameOver = false;
@@ -42,9 +39,8 @@ int main(void)
 	GameState StateBuffer = WAITING_FOR_INPUT;
 
 	Action PlayerAction = NONE;
-	bool ActionChosen = false;
 
-	//	DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+
 
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
@@ -57,7 +53,7 @@ int main(void)
 		}
 
 		BeginDrawing();      //~~~~ Begin frame rendering  ~~~~~~~//
-	//	ClearBackground(BLACK); // THIS CODE WAS DELETED
+		ClearBackground(BLACK); 
 		DrawTexture(Background, 0,0, WHITE);
 
 		if (State == GAME_OVER)
@@ -85,13 +81,13 @@ int main(void)
 		EndDrawing();
 
 
+	}
 		UnloadTexture(Background);
 		CloseWindow();
 		return 0;
-	}
 }
 
-	void DrawWaitForInput(Action & PlayerAction, GameState & State, Player & MainPlayer, GameState & StateBuffer)
+	void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer)
 	{
 		DrawText("Choose Action 1 attack 2 parry 3 defend", 10, 30, 20, GREEN);
 		switch (GetKeyPressed())
@@ -134,15 +130,15 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 	ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
 	StateBuffer = WAITING_FOR_INPUT;
 
-	static bool executed = false;	
+	//static bool executed = false;	
 
-	if (RoundNumber == 3 && !executed)
-	{
-		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
-		MainPlayer.UpdateHealth(2);
-		executed = true;
-		StateBuffer = WAITING_FOR_INPUT;
-	}
+	//if (RoundNumber == 3 && !executed)
+	//{
+	//	DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
+	//	MainPlayer.UpdateHealth(2);
+	//	executed = true;
+	//	StateBuffer = WAITING_FOR_INPUT;
+	//}
 
 	if (!MainEnemy.GetIsAlive())
 	{
@@ -200,7 +196,7 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction)
 	DrawText(("Adam " + PlayerActionStr + "s").c_str(), 10, 60, 20, LIGHTGRAY);
 	DrawText(("She " + EnemyActionStr + "s").c_str(), 10, 80, 20, LIGHTGRAY);
 
-	static std::map<std::pair<Action, Action>, CombatOutcome> OutcomeMap =
+	static std::map<std::pair<Action, Action>, CombatOutcome> OutcomeMap = 
 
 	{
 
