@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 #include "raylib.h"
-#include "Log.h"
+#include "CombatLog.h"
 #include "Player.h"
 #include "Enemy.h"
 #include <map>
@@ -10,7 +10,7 @@
 enum GameState { WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO };
 void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
 void ProcessOutcome(Player& Mainplayer, Enemy& MainEnemy, Action PlayerAction);
-void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer);
+void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer) ;
 
 struct CombatOutcome
 {
@@ -24,8 +24,8 @@ int main(void)
 	const int screenWidth = 800;
 	const int screenHeight = 600;
 	InitWindow(screenWidth, screenHeight, "Adams Temptation");
-
 	Texture2D Background = LoadTexture("../SourceArt/Arena.png");
+	Texture2D AdamText = LoadTexture("../SourceArt/Characters/Knight/Knight_IdleBlinking_Sprite.png");
 
 	SetTargetFPS(60);
 
@@ -55,17 +55,17 @@ int main(void)
 		BeginDrawing();      //~~~~ Begin frame rendering  ~~~~~~~//
 		ClearBackground(BLACK); 
 		DrawTexture(Background, 0,0, WHITE);
-
+		DrawTexture(AdamText, 75, 210, WHITE);
 		if (State == GAME_OVER)
 		{
 
-			DrawText("Game Over. Press ESC to exit. ", 190, 200, 20, LIGHTGRAY);
+			DrawText("Game Over. Press ESC to exit. ", 160, 200, 30, RAYWHITE);
 			EndDrawing();                   // Finalizes frame rendering
 			continue;
 
 		}
 
-		DrawText(("Round " + std::to_string(RoundNumber)).c_str(), 10, 10, 20, LIGHTGRAY);
+		DrawText(("Round " + std::to_string(RoundNumber)).c_str(), 700, 400, 22, LIGHTGRAY);
 
 		if (State == WAITING_FOR_INPUT)
 		{
@@ -89,7 +89,7 @@ int main(void)
 
 	void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer)
 	{
-		DrawText("Choose Action 1 attack 2 parry 3 defend", 10, 30, 20, GREEN);
+		DrawText("Choose Action (1 Tempt, 2 Rebuke, 3 Repent)", 10, 400, 20, GREEN);
 		switch (GetKeyPressed())
 		{
 		case KEY_ONE:
@@ -109,7 +109,7 @@ int main(void)
 			{
 				State = INFO;
 				StateBuffer = WAITING_FOR_INPUT;
-				DrawText(" you are drained Defend to regain strength", 10, 300, 20, RED);
+				DrawText("Adam is too tired to rebuke, he needs to repent", 10, 460, 20, RED);
 				break;
 			}
 		case KEY_THREE:
@@ -134,7 +134,7 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 
 	if (RoundNumber == 3 && !executed)
 	{
-		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 10, 320, 20, GREEN);
+		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 100, 560, 25, LIME);
 		MainPlayer.UpdateHealth(2);
 		executed = true;
 		StateBuffer = WAITING_FOR_INPUT;
@@ -143,20 +143,20 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 	if (!MainEnemy.GetIsAlive())
 	{
 
-		RoundNumber++; // += 1; WAS ORIGINAL SUPPOSDELY THE SAME OUTCOME
+		RoundNumber++; 
 
 		if (RoundNumber > 5)
 		{
-			DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 190, 200, 20, GREEN);
+			DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 10, 420, 20, GREEN);
 			StateBuffer = GAME_OVER;
 		}
 		else
 		{
-			DrawText((MainEnemy.GetName() + " has been defeated. A new girl appears ").c_str(), 190, 200, 20, LIGHTGRAY);
+			DrawText((MainEnemy.GetName() + " fell to sin. A new girl appears ").c_str(), 10, 480, 20, LIGHTGRAY);
 			MainEnemy.IncreaseDifficulty(RoundNumber);
-			DrawText((MainEnemy.GetName() + " looks mad that you beat her sister").c_str(), 190, 220, 20, LIGHTGRAY);
+			DrawText((MainEnemy.GetName() + " looks mad.").c_str(), 10, 500, 20, LIGHTGRAY);
 			MainPlayer.InitStats();
-			DrawText((MainEnemy.GetName() + " glares while, Adam Recovers his stamina\n ready for the next...").c_str(), 190, 240, 20, YELLOW);
+			DrawText("Adam recovers energy..", 10, 520, 20, YELLOW);
 			StateBuffer = WAITING_FOR_INPUT;
 			Wait = 5;
 
@@ -165,7 +165,7 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 
 	if (!MainPlayer.GetIsAlive())
 	{
-		DrawText("Adam fell to sin ", 10, 350, 20, RED);
+		DrawText("Adam fell to sin ", 10, 520, 20, RED);
 		StateBuffer = GAME_OVER;
 	}
 	State = INFO;
@@ -182,9 +182,9 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction)
 		{
 			switch (action)
 			{
-			case ATTACK: return "Attack";
-			case DEFEND: return "Defend";
-			case PARRY: return "Parry";
+			case ATTACK: return "Tempt";
+			case PARRY: return "Rebuke";
+			case DEFEND: return "Repent";
 			default: return "";
 			}
 		};
@@ -193,26 +193,26 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction)
 	std::string EnemyActionStr = GetActionString(EnemyAction);
 
 	// Display player and enemy actions
-	DrawText(("Adam " + PlayerActionStr + "s").c_str(), 10, 60, 20, LIGHTGRAY);
-	DrawText(("She " + EnemyActionStr + "s").c_str(), 10, 80, 20, LIGHTGRAY);
+	DrawText(("Adam " + PlayerActionStr + "s").c_str(), 630, 440, 20, LIGHTGRAY);
+	DrawText(("She " + EnemyActionStr + "s").c_str(), 630, 460, 20, LIGHTGRAY);
 
 	static std::map<std::pair<Action, Action>, CombatOutcome> OutcomeMap = 
 
 	{
 
-		{ { ATTACK, ATTACK }, { "Clash! wow close one ", DARKGRAY, [](Player& player, Enemy& enemy) {} } },
-		{ { ATTACK, PARRY }, {MainEnemy.GetName() + " Parries the attack! We got hurt ", RED, [](Player& player, Enemy& enemy) {player.UpdateHealth(-(enemy.GetAtkPower() * 2)); }}},
-		{ { ATTACK, DEFEND }, {MainEnemy.GetName() + " Blocked attack, took less damage", LIGHTGRAY,[](Player& player, Enemy& enemy) {enemy.UpdateHealth(-(player.GetAtkPower() / 2)); } } },
-		{ { PARRY, ATTACK }, {"Adam Parries and Hurt her ", LIGHTGRAY,[](Player& player, Enemy& enemy) {enemy.UpdateHealth(-(player.GetAtkPower() * 2)); }} },
-		{ { PARRY, PARRY }, {"Both lost stamina by Parrying", DARKGRAY,[](Player& player, Enemy& enemy) {} }},
-		{ { PARRY, DEFEND }, {"Adam loses Stamina while the Enemy recovers!", DARKGRAY,[](Player& player, Enemy& enemy) {} }},
-		{ { DEFEND, ATTACK }, {"Adam defended against the attack! took little damage", DARKGRAY,[](Player& player, Enemy& enemy) {player.UpdateHealth(-(enemy.GetAtkPower() + 1)); }} },			{ { DEFEND, PARRY }, {"Enemy loses Stamina while Adam Recovers ",DARKGRAY,[](Player& player, Enemy& enemy) {} }},
-		{ { DEFEND, PARRY }, {"she parried! waste of energy ", DARKGRAY,[](Player& player, Enemy& enemy) {}} },
-		{ { DEFEND, DEFEND }, {"both are recovering ", DARKGRAY,[](Player& player, Enemy& enemy) {}} }
+		{ { ATTACK, ATTACK }, { "Both failed to tempt! ", ORANGE, [](Player& player, Enemy& enemy) {} } },
+		{ { ATTACK, PARRY }, {MainEnemy.GetName() + " Rebuke hurt Adam.", RED, [](Player& player, Enemy& enemy) {player.UpdateHealth(-(enemy.GetAtkPower() * 2)); }}},
+		{ { ATTACK, DEFEND }, {MainEnemy.GetName() + " repent interupted, hurt her.", LIGHTGRAY,[](Player& player, Enemy& enemy) {enemy.UpdateHealth(-(player.GetAtkPower() / 2)); } } },
+		{ { PARRY, ATTACK }, {"Adam rebuke hurt her. ", LIGHTGRAY,[](Player& player, Enemy& enemy) {enemy.UpdateHealth(-(player.GetAtkPower() * 2)); }} },
+		{ { PARRY, PARRY }, {"Both spent energy rebuking.", GOLD,[](Player& player, Enemy& enemy) {} }},
+		{ { PARRY, DEFEND }, {"Adam spent energy, while she repents!", GOLD,[](Player& player, Enemy& enemy) {} }},
+		{ { DEFEND, ATTACK }, {"Adam's repent was interupted and it hurt.", YELLOW,[](Player& player, Enemy& enemy) {player.UpdateHealth(-(enemy.GetAtkPower() + 1)); }} },
+		{ { DEFEND, PARRY }, {"She wasted energy! Adam repents! ", RAYWHITE,[](Player& player, Enemy& enemy) {}} },
+		{ { DEFEND, DEFEND }, {"Both are repenting ", RAYWHITE,[](Player& player, Enemy& enemy) {}} }
 	};
 
 	CombatOutcome Outcome = OutcomeMap[{PlayerAction, EnemyAction}];
 	//DISPLAY OUTCOME TEXT
-	DrawText(Outcome.OutcomeText.c_str(), 10, 120, 20, Outcome.TextColor);
+	DrawText(Outcome.OutcomeText.c_str(), 10, 460, 20, Outcome.TextColor);
 	Outcome.GameplayResult(MainPlayer, MainEnemy);
 }

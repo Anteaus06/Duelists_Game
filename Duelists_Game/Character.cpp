@@ -1,5 +1,5 @@
-#include "Character.h"
 #include <iostream>
+#include "Character.h"
 #include "raylib.h"
 
 
@@ -13,8 +13,8 @@ void Character::UpdateHealth(int Amount)
 {
 	Health += Amount;
 	if (Health <= 0) Health = 0;
-	std::cout << Name << " has " << Health << " remaining" << std::endl;
-	DrawText((Name + " has " + std::to_string(Health) + " Health remaining.").c_str(), 190, 180, 20, GREEN);
+	//std::cout << Name << " has " << Health << " remaining" << std::endl;
+	DrawText((Name + " has " + std::to_string(Health) + " Health remaining.").c_str(), 10, 440, 20, GOLD);
 }
 
 void Character::UpdateStamina(bool Increase)
@@ -39,7 +39,6 @@ void Character::GetHeal(int Heal)
 {
 	Heal = MaxHealth + 2;
 
-	std::cout << Name << " healed " << std::endl;
 }
 
 Action Character::GetActionFromInput(int Input)
