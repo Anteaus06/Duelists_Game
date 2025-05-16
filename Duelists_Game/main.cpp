@@ -7,10 +7,10 @@
 #include <functional>
 
 
-enum GameState { WAITING_FOR_INPUT, PROCESSING, GAME_OVER, INFO };
-void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait);
+enum GameState { WAITING_FOR_INPUT, PROCESSING, GAME_OVER};
+void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, int& RoundNumber);
 void ProcessOutcome(Player& Mainplayer, Enemy& MainEnemy, Action PlayerAction);
-void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer) ;
+void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer) ;
 
 struct CombatOutcome
 {
@@ -25,7 +25,7 @@ int main(void)
 	const int screenHeight = 600;
 	InitWindow(screenWidth, screenHeight, "Adams Temptation");
 	Texture2D Background = LoadTexture("../SourceArt/Arena.png");
-	Texture2D AdamText = LoadTexture("../SourceArt/Characters/Knight/Knight_IdleBlinking_Sprite.png");
+	//Texture2D AdamText = LoadTexture("../SourceArt/Characters/Knight/Knight_IdleBlinking_Sprite.png");
 
 	SetTargetFPS(60);
 
@@ -36,7 +36,7 @@ int main(void)
 	bool GameOver = false;
 	int Wait = 3;
 	GameState State = WAITING_FOR_INPUT;
-	GameState StateBuffer = WAITING_FOR_INPUT;
+	
 
 	Action PlayerAction = NONE;
 
@@ -44,18 +44,15 @@ int main(void)
 
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
-		// Refreshes screen every loop
-		if (State == INFO)
-		{
-			WaitTime(Wait);
-			State = StateBuffer;
-			Wait = 3;
-		}
+		
 
 		BeginDrawing();      //~~~~ Begin frame rendering  ~~~~~~~//
 		ClearBackground(BLACK); 
 		DrawTexture(Background, 0,0, WHITE);
-		DrawTexture(AdamText, 75, 210, WHITE);
+		//DrawTexture(AdamText, 75, 210, WHITE);
+
+		CombatLog::DrawMessages();
+
 		if (State == GAME_OVER)
 		{
 
@@ -69,13 +66,13 @@ int main(void)
 
 		if (State == WAITING_FOR_INPUT)
 		{
-			DrawWaitForInput(PlayerAction, State, MainPlayer, StateBuffer);
+			DrawWaitForInput(PlayerAction, State, MainPlayer);
 
 		}
 
 		else if (State == PROCESSING)
 		{
-			DrawOutcome(MainPlayer, MainEnemy, PlayerAction, State, StateBuffer, RoundNumber, Wait);
+			DrawOutcome(MainPlayer, MainEnemy, PlayerAction, State, RoundNumber);
 
 		}
 		EndDrawing();
@@ -87,9 +84,9 @@ int main(void)
 		return 0;
 }
 
-	void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer, GameState& StateBuffer)
+	void DrawWaitForInput(Action& PlayerAction, GameState& State, Player& MainPlayer)
 	{
-		DrawText("Choose Action (1 Tempt, 2 Rebuke, 3 Repent)", 10, 400, 20, GREEN);
+		DrawText("Choose Action (1 Tempt, 2 Rebuke, 3 Repent)", 10, 400, 20, BLACK);
 		switch (GetKeyPressed())
 		{
 		case KEY_ONE:
@@ -107,9 +104,8 @@ int main(void)
 			}
 			else
 			{
-				State = INFO;
-				StateBuffer = WAITING_FOR_INPUT;
-				DrawText("Adam is too tired to rebuke, he needs to repent", 10, 460, 20, RED);
+				
+				CombatLog::AddMessage("Adam is too tired to rebuke, he needs to repent", RED, 1.0f);
 				break;
 			}
 		case KEY_THREE:
@@ -125,10 +121,9 @@ int main(void)
 	}
 	
 
-void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, GameState& StateBuffer, int& RoundNumber, int& Wait)
+void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, GameState& State, int& RoundNumber)
 {
 	ProcessOutcome(MainPlayer, MainEnemy, PlayerAction);
-	StateBuffer = WAITING_FOR_INPUT;
 
 	static bool executed = false;	
 
@@ -137,7 +132,7 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 		DrawText((MainEnemy.GetName() + " Dropped apple, Adam ate it and healed").c_str(), 100, 560, 25, LIME);
 		MainPlayer.UpdateHealth(2);
 		executed = true;
-		StateBuffer = WAITING_FOR_INPUT;
+		State = WAITING_FOR_INPUT;
 	}
 
 	if (!MainEnemy.GetIsAlive())
@@ -147,28 +142,27 @@ void DrawOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction, Game
 
 		if (RoundNumber > 5)
 		{
-			DrawText((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), 10, 420, 20, GREEN);
-			StateBuffer = GAME_OVER;
+
+			CombatLog::AddMessage((MainEnemy.GetName() + " bows down! Man Rules ").c_str(), GREEN, 1.5f);
+			State = GAME_OVER;
 		}
 		else
 		{
-			DrawText((MainEnemy.GetName() + " fell to sin. A new girl appears ").c_str(), 10, 480, 20, LIGHTGRAY);
+			CombatLog::AddMessage((MainEnemy.GetName() + " fell to sin. A new girl appears ").c_str(), LIGHTGRAY, 1.5f);
 			MainEnemy.IncreaseDifficulty(RoundNumber);
-			DrawText((MainEnemy.GetName() + " looks mad.").c_str(), 10, 500, 20, LIGHTGRAY);
+			CombatLog::AddMessage((MainEnemy.GetName() + " looks mad.").c_str(), LIGHTGRAY, 1.5f);
 			MainPlayer.InitStats();
-			DrawText("Adam recovers energy..", 10, 520, 20, YELLOW);
-			StateBuffer = WAITING_FOR_INPUT;
-			Wait = 5;
+			CombatLog::AddMessage("Adam recovers energy..", YELLOW, 1.5f);
 
 		}
 	}
 
 	if (!MainPlayer.GetIsAlive())
 	{
-		DrawText("Adam fell to sin ", 10, 520, 20, RED);
-		StateBuffer = GAME_OVER;
+		CombatLog::AddMessage("Adam fell to sin ", RED, 15.5f);
+		State = GAME_OVER;
 	}
-	State = INFO;
+	State = WAITING_FOR_INPUT;
 }
 
 
@@ -193,8 +187,8 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction)
 	std::string EnemyActionStr = GetActionString(EnemyAction);
 
 	// Display player and enemy actions
-	DrawText(("Adam " + PlayerActionStr + "s").c_str(), 630, 440, 20, LIGHTGRAY);
-	DrawText(("She " + EnemyActionStr + "s").c_str(), 630, 460, 20, LIGHTGRAY);
+	CombatLog::AddMessage(("Adam " + PlayerActionStr + "s").c_str(), LIGHTGRAY, 1.5f);
+	CombatLog::AddMessage(("She " + EnemyActionStr + "s").c_str(), LIGHTGRAY, 1.5f);
 
 	static std::map<std::pair<Action, Action>, CombatOutcome> OutcomeMap = 
 
@@ -213,6 +207,6 @@ void ProcessOutcome(Player& MainPlayer, Enemy& MainEnemy, Action PlayerAction)
 
 	CombatOutcome Outcome = OutcomeMap[{PlayerAction, EnemyAction}];
 	//DISPLAY OUTCOME TEXT
-	DrawText(Outcome.OutcomeText.c_str(), 10, 460, 20, Outcome.TextColor);
+	CombatLog::AddMessage(Outcome.OutcomeText.c_str(), Outcome.TextColor, 1.5f);
 	Outcome.GameplayResult(MainPlayer, MainEnemy);
 }

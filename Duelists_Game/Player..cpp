@@ -1,6 +1,5 @@
 #include "Player.h"
-#include "Enemy.h"
-#include "Log.h"
+#include <iostream>
 #include "raylib.h"
 
 //Passes all arguments to Character constructer

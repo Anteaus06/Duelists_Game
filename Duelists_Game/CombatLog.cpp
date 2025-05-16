@@ -2,8 +2,8 @@
 #include "CombatLog.h"
 
 std::vector<CombatMessage> CombatLog::MessageBuffer;
-const int START_Y_POSITION = 410.0f;
-const int MESSAGE_SPACING = 25.0f;
+const int START_Y_POSITION = 410;
+const int MESSAGE_SPACING = 25;
 const int MAX_MESSAGES = 6;
 const int FONT_SIZE = 18;
 
