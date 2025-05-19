@@ -23,7 +23,7 @@ void CombatLog::DrawMessages()
 	for (size_t i = 0; i < MessageBuffer.size();)
 	{
 		CombatMessage& MessageAtIndex = MessageBuffer[i];
-		DrawText(MessageAtIndex.Message.c_str(), 10, START_Y_POSITION, FONT_SIZE, MessageAtIndex.TextColor);
+		DrawText(MessageAtIndex.Message.c_str(), 10,YPosition, FONT_SIZE, MessageAtIndex.TextColor);
 		YPosition += MESSAGE_SPACING;
 
 		MessageAtIndex.Timer += GetFrameTime();
